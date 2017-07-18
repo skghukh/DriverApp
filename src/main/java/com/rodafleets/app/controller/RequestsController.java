@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rodafleets.app.config.AppConfig;
+import com.rodafleets.app.dataaccess.BidRepository;
 import com.rodafleets.app.dataaccess.CustomerRepository;
 import com.rodafleets.app.dataaccess.DriverRepository;
 import com.rodafleets.app.dataaccess.RequestsRepository;
+import com.rodafleets.app.model.Bid;
 import com.rodafleets.app.model.Customer;
 import com.rodafleets.app.model.Driver;
 import com.rodafleets.app.model.VehicleRequest;
@@ -45,6 +47,9 @@ public class RequestsController {
 	
 	@Autowired
 	private CustomerRepository customerRepo;
+	
+	@Autowired
+	private BidRepository bidRepo;
 	
 	/*
 	 * Retrive all drivers and their info
@@ -77,7 +82,7 @@ public class RequestsController {
 	public ResponseEntity<?> saveBid(
 			@PathVariable("request_id") long requestId,
 			@RequestParam(value="bid_amount_in_cents") long bidAmountInCents) {
-		return null;
+		return addBid(requestId, bidAmountInCents);
 	}
 	
 	private ResponseEntity<?> findAllRequestsByCustomer(long customerId) {
@@ -113,7 +118,7 @@ public class RequestsController {
 			requestsRepo.save(request);
 			logger.info("data saved");
 			//send notification to the devices near by
-			sendNotificationRequestToDrivers(request, distanceStr);
+			sendRequestNotificationToDrivers(request, distanceStr);
 		}
 		catch (Exception ex) {
 			
@@ -129,7 +134,17 @@ public class RequestsController {
 		return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.CREATED);
 	}
 	
-	private void sendNotificationRequestToDrivers(VehicleRequest request, String distanceStr) {
+	private ResponseEntity<?> addBid(long requestId, long bidAmountInCents) {
+		jsonResponse = new CustomResponse();
+		Bid bid = new Bid(requestId, bidAmountInCents);
+		bidRepo.save(bid);
+		//TODO send notification to customer
+		//sendBidNotificationToCustomer();
+		jsonResponse.setMessage("Bid info saved");	    
+		return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.CREATED);
+	}
+	
+	private void sendRequestNotificationToDrivers(VehicleRequest request, String distanceStr) {
 		//get all drivers who are online. TODO Change this algorithm to pick the best driver based on rating and location
 		
 		String androidTokens = null;
