@@ -60,7 +60,7 @@ public class DriverController {
 	/*
 	 * Retrive all drivers and their info
 	 * 
-	 * @Url: localhost:8080/drivers
+	 * @Url: API_URL/API_VERSION/drivers
 	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<?> getAll() {
@@ -72,10 +72,11 @@ public class DriverController {
 	 * 
 	 * @RequestParam: firstname
 	 * 
-	 * @Url: localhost:8080/drivers?firstname=?
+	 * @Url: API_URL/API_VERSION/drivers?firstname=?
 	 */
 	@RequestMapping(method = RequestMethod.GET, params = "firstname")
-	public ResponseEntity<?> getDriverByFirtsName(@RequestParam(value = "firstname") String firstName) {
+	public ResponseEntity<?> getDriverByFirtsName(
+			@RequestParam(value = "firstname") String firstName) {
 		return findDriverByFirstName(firstName);
 	}
 
@@ -83,13 +84,13 @@ public class DriverController {
 	 * Search drivers with specified firstname and lastname
 	 * 
 	 * @RequestParam: firstname
-	 * 
 	 * @RequestParam: lastname
 	 * 
-	 * @Url: localhost:8080/drivers?firstname=?&lastname=?
+	 * @Url: API_URL/API_VERSION/drivers?firstname=?&lastname=?
 	 */
 	@RequestMapping(method = RequestMethod.GET, params = "{firstname, lastname}")
-	public ResponseEntity<?> getDriverByFirstAndLastName(@RequestParam(value = "firstname") String firstName,
+	public ResponseEntity<?> getDriverByFirstAndLastName(
+			@RequestParam(value = "firstname") String firstName,
 			@RequestParam(value = "lastname") String lastName) {
 		return findDriverByFirstAndLastName(firstName, lastName);
 	}
@@ -97,23 +98,25 @@ public class DriverController {
 	/*
 	 * 
 	 * @RequestParam: firstname
-	 * 
 	 * @RequestParam: lastname
 	 * 
-	 * @Url: localhost:8080/drivers/
+	 * @Url: API_URL/API_VERSION/drivers/
 	 */
 
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> saveDriver(@RequestParam(value = "phonenumber") String phoneNumber,
-			@RequestParam(value = "firstname") String firstName, @RequestParam(value = "lastname") String lastName,
-			@RequestParam(value = "gender") String gender) {
-		return addDriver(phoneNumber, firstName, lastName, gender);
+	public ResponseEntity<?> saveDriver(
+			@RequestParam(value = "phonenumber") String phoneNumber,
+			@RequestParam(value = "firstname") String firstName, 
+			@RequestParam(value = "lastname") String lastName,
+			@RequestParam(value = "gender") String gender,
+			@RequestParam(value = "android_token", required = false) String androidToken,
+			@RequestParam(value = "ios_token", required = false) String iosToken) {
+		return addDriver(phoneNumber, firstName, lastName, gender, androidToken, iosToken);
 	}
 
 	/*
 	 * 
 	 * @RequestParam: firstname
-	 * 
 	 * @RequestParam: lastname
 	 * 
 	 * @Url: localhost:8080/drivers/1?firstname=?&lastname=?
@@ -128,6 +131,12 @@ public class DriverController {
 			@RequestParam(value = "status", required = false, defaultValue = "0") int status,
 			@RequestParam(value = "password", required = false) String password) {
 		return editDriver(id, otp, sessionId, firstName, lastName, gender, password);
+	}
+	
+	@RequestMapping(value = "/{id}/updateandroidtoken", method = RequestMethod.POST)
+	public ResponseEntity<?> updateDriver(@PathVariable("id") long driverId,
+			@RequestParam(value = "token", required = false) String token) {
+		return updateAndroidToken(driverId, token);
 	}
 
 	/*
@@ -211,8 +220,13 @@ public class DriverController {
 		return new ResponseEntity<List>(drivers, HttpStatus.OK);
 	}
 
-	private ResponseEntity<?> addDriver(String phoneNumber, String firstName, String lastName, String gender) {
+	private ResponseEntity<?> addDriver(String phoneNumber, String firstName, String lastName, String gender, String androidToken, String iosToken) {
+		
 		DriverResponse jsonResponse = new DriverResponse();
+		if(androidToken == "" && iosToken == "") {
+			jsonResponse.setMessage("Registration Token missing");
+			return new ResponseEntity<DriverResponse>(jsonResponse, HttpStatus.BAD_REQUEST);
+		}
 		String otpSessionId;
 		// send sms to verify the phoneNumber
 		otpSessionId = sendOTP(phoneNumber);
@@ -224,6 +238,13 @@ public class DriverController {
 		} else {
 			Driver driver = new Driver(phoneNumber, firstName, lastName, gender);
 			driver.setPassword(""); // default value
+			if(!androidToken.equals("")) {
+				driver.setAndroidToken(androidToken);
+			}
+			
+			if(!iosToken.equals("")) {
+				driver.setIosToken(iosToken);
+			}
 			driverRepo.save(driver);
 
 			jsonResponse.setDriver(driver);
@@ -293,6 +314,28 @@ public class DriverController {
 		//			return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.PRECONDITION_FAILED);
 		//		}
 
+		jsonResponse.setMessage("Driver info updated!");
+		return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.OK);
+	}
+	
+	private ResponseEntity<?> updateAndroidToken(long driverId, String token) {
+		jsonResponse = new CustomResponse();
+		//		try {
+		Driver driver = driverRepo.findOne(driverId);
+		driver.setAndroidToken(token);
+		driverRepo.save(driver);
+		
+		jsonResponse.setMessage("Driver info updated!");
+		return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.OK);
+	}
+	
+	private ResponseEntity<?> updateiosToken(long driverId, String token) {
+		jsonResponse = new CustomResponse();
+		//		try {
+		Driver driver = driverRepo.findOne(driverId);
+		driver.setIosToken(token);
+		driverRepo.save(driver);
+		
 		jsonResponse.setMessage("Driver info updated!");
 		return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.OK);
 	}

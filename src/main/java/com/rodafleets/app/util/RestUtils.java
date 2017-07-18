@@ -93,10 +93,11 @@ public class RestUtils {
 		}
 	}
 
-	public JSONObject distance(double pickupPointLat, double pickupPointLng, double dropPointLat, double dropPointLng) {
+	public JSONObject distance(double originLat, double originLng,
+			double destinationLat, double destinationLng) {
 		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
-		urlParameters.add(new BasicNameValuePair("origins", pickupPointLat + "," + pickupPointLng));
-		urlParameters.add(new BasicNameValuePair("destinations", dropPointLat + "," + dropPointLng));
+		urlParameters.add(new BasicNameValuePair("origins", originLat + "," + originLng));
+		urlParameters.add(new BasicNameValuePair("destinations", destinationLat + "," + destinationLng));
 		urlParameters.add(new BasicNameValuePair("key", AppConfig.GOOGLE_DISTANCE_MATRIX_API_KEY));
 		
 		return this.httpGetRequest(AppConfig.GOOGLE_DISTANCE_MATRIX_API_URL, urlParameters);

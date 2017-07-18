@@ -26,6 +26,14 @@ public class Driver {
 	
 	private String password;
 	private long verified;
+	
+	@Column(name="androidtoken")
+	private String androidToken;
+	
+	@Column(name="iostoken")
+	private String iosToken;
+	
+	private Boolean status;
 
 	protected Driver() {}
 
@@ -34,6 +42,30 @@ public class Driver {
 		this.firstname = firstName;
 		this.lastname = lastName;
 		this.gender = gender;
+	}
+
+	public Boolean getStatus() {
+		return status;
+	}
+
+	public void setStatus(Boolean status) {
+		this.status = status;
+	}
+
+	public String getAndroidToken() {
+		return androidToken;
+	}
+
+	public void setAndroidToken(String androidToken) {
+		this.androidToken = androidToken;
+	}
+
+	public String getIosToken() {
+		return iosToken;
+	}
+
+	public void setIosToken(String iosToken) {
+		this.iosToken = iosToken;
 	}
 
 	public long getId() {

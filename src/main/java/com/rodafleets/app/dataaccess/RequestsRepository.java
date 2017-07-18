@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.rodafleets.app.model.Requests;
+import com.rodafleets.app.model.VehicleRequest;
 
-public interface RequestsRepository extends CrudRepository<Requests, Long> {
+public interface RequestsRepository extends CrudRepository<VehicleRequest, Long> {
 
-	List<Requests> findRequestsByCustomerId(long id);
+	List<VehicleRequest> findRequestsByCustomerId(long id);
 
 }

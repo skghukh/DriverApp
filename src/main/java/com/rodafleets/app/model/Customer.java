@@ -109,4 +109,9 @@ public class Customer {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+	
+	public String getFullName() {
+		//TODO
+		return firstName + " " + lastName;
+	}
 }
