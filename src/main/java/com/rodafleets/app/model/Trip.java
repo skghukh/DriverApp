@@ -7,29 +7,29 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class Bid {
+public class Trip {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
 
-	@Column(name="bidamountincents")
-	private long bidAmountInCents;
+	@Column(name="bid_id")
+	private long bidId;
 	
 	@Column(name="vehiclerequest_id")
 	private long requestId; 
 	
-	@Column(name="driver_id")
-	private long driverId;
+	@Column(name="customer_id")
+	private long customerId;
 
 	private int status;
 
-	protected Bid() {}
+	protected Trip() {}
 	
-	public Bid(long requestId, long driverId, long bidAmountInCents, int status) {
+	public Trip(long requestId, long bidId, long customerId, int status) {
 		this.requestId = requestId;
-		this.driverId = driverId;
-		this.bidAmountInCents = bidAmountInCents;
+		this.bidId = bidId;
+		this.customerId = customerId;
 		this.status = status;
 	}
 
@@ -41,12 +41,12 @@ public class Bid {
 		this.id = id;
 	}
 
-	public long getBidAmountInCents() {
-		return bidAmountInCents;
+	public long getBidId() {
+		return bidId;
 	}
 
-	public void setBidAmountInCents(long bidAmountInCents) {
-		this.bidAmountInCents = bidAmountInCents;
+	public void setBidId(long bidId) {
+		this.bidId = bidId;
 	}
 
 	public long getRequestId() {
@@ -57,12 +57,12 @@ public class Bid {
 		this.requestId = requestId;
 	}
 
-	public long getDriverId() {
-		return driverId;
+	public long getCustomerId() {
+		return customerId;
 	}
 
-	public void setDriverId(long driverId) {
-		this.driverId = driverId;
+	public void setCustomerId(long customerId) {
+		this.customerId = customerId;
 	}
 
 	public int getStatus() {

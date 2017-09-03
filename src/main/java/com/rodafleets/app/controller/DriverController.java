@@ -1,6 +1,7 @@
 package com.rodafleets.app.controller;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -23,13 +24,19 @@ import com.rodafleets.app.auth.jwt.JwtTokenUtil;
 import com.rodafleets.app.config.AppConfig;
 import com.rodafleets.app.dataaccess.DriverDocsRepository;
 import com.rodafleets.app.dataaccess.DriverRepository;
+import com.rodafleets.app.dataaccess.VehicleRequestNotificationHistoryRepository;
+import com.rodafleets.app.dataaccess.VehicleRequestsRepository;
 import com.rodafleets.app.exception.CustomException;
 import com.rodafleets.app.model.Driver;
 import com.rodafleets.app.model.DriverDocs;
+import com.rodafleets.app.model.VehicleRequest;
+import com.rodafleets.app.model.VehicleRequestNotificationHistory;
 import com.rodafleets.app.response.CustomResponse;
 import com.rodafleets.app.response.DriverResponse;
 import com.rodafleets.app.service.FileArchiveService;
 import com.rodafleets.app.service.OTPService;
+
+import net.minidev.json.JSONArray;
 
 /*===================  Driver API  =================== */
 
@@ -53,6 +60,12 @@ public class DriverController {
 
 	@Autowired
 	private DriverDocsRepository driverDocsRepo;
+	
+	@Autowired
+	private VehicleRequestsRepository requestsRepo;
+	
+	@Autowired
+	private VehicleRequestNotificationHistoryRepository historyRepo;
 
 	@Autowired
 	private FileArchiveService fileArchiveService;
@@ -111,7 +124,7 @@ public class DriverController {
 			@RequestParam(value = "gender") String gender,
 			@RequestParam(value = "android_token", required = false) String androidToken,
 			@RequestParam(value = "ios_token", required = false) String iosToken) {
-		return addDriver(phoneNumber, firstName, lastName, gender, androidToken, iosToken);
+		return addDriver(phoneNumber, firstName, lastName, gender);
 	}
 
 	/*
@@ -133,12 +146,6 @@ public class DriverController {
 		return editDriver(id, otp, sessionId, firstName, lastName, gender, password);
 	}
 	
-	@RequestMapping(value = "/{id}/updateandroidtoken", method = RequestMethod.POST)
-	public ResponseEntity<?> updateDriver(@PathVariable("id") long driverId,
-			@RequestParam(value = "token", required = false) String token) {
-		return updateAndroidToken(driverId, token);
-	}
-
 	/*
 	 * 
 	 * @RequestParam: document1
@@ -153,6 +160,13 @@ public class DriverController {
 			@RequestParam(value = "document2", required = false) MultipartFile document2,
 			@RequestParam(value = "document3", required = false) MultipartFile document3) {
 		return addDriverDocs(driverId, document1, document2, document3);
+	}
+	
+	@RequestMapping(value = "/{id}/deviceregistration", method = RequestMethod.POST)
+	public ResponseEntity<?> updateDriver(@PathVariable("id") long driverId,
+			@RequestParam(value = "registrationid") String registartionId,
+			@RequestParam(value = "device_os") String deviceOs) {
+		return updateRegistrationId(driverId, registartionId, deviceOs);
 	}
 
 	//	/*
@@ -178,8 +192,10 @@ public class DriverController {
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<?> login(@RequestParam(value = "phonenumber") String phoneNumber,
-			@RequestParam(value = "password") String password) {
-		return signin(phoneNumber, password);
+			@RequestParam(value = "password") String password,
+			@RequestParam(value = "android_registrationid", required = false) String androidRegistrationId,
+			@RequestParam(value = "ios_registrationid", required = false) String iosRegistrationId) {
+		return signin(phoneNumber, password, androidRegistrationId, iosRegistrationId);
 	}
 
 	/* ===== ====== */
@@ -220,13 +236,17 @@ public class DriverController {
 		return new ResponseEntity<List>(drivers, HttpStatus.OK);
 	}
 
-	private ResponseEntity<?> addDriver(String phoneNumber, String firstName, String lastName, String gender, String androidToken, String iosToken) {
-		
+	private ResponseEntity<?> addDriver(String phoneNumber, String firstName, String lastName, String gender) {
 		DriverResponse jsonResponse = new DriverResponse();
-		if(androidToken == "" && iosToken == "") {
-			jsonResponse.setMessage("Registration Token missing");
-			return new ResponseEntity<DriverResponse>(jsonResponse, HttpStatus.BAD_REQUEST);
-		}
+		
+//		//check if phoneNumber is registered.
+//		Driver driver = driverRepo.findOneByPhoneNumber(phoneNumber);
+//		if(driver != null) {
+//			if(driver.getVerified()) {
+//				//
+//			}
+//		}
+		
 		String otpSessionId;
 		// send sms to verify the phoneNumber
 		otpSessionId = sendOTP(phoneNumber);
@@ -238,13 +258,14 @@ public class DriverController {
 		} else {
 			Driver driver = new Driver(phoneNumber, firstName, lastName, gender);
 			driver.setPassword(""); // default value
-			if(!androidToken.equals("")) {
-				driver.setAndroidToken(androidToken);
-			}
-			
-			if(!iosToken.equals("")) {
-				driver.setIosToken(iosToken);
-			}
+			driver.setStatus(false);
+//			if(!androidToken.equals("")) {
+//				driver.setAndroidToken(androidToken);
+//			}
+//			
+//			if(!iosToken.equals("")) {
+//				driver.setIosToken(iosToken);
+//			}
 			driverRepo.save(driver);
 
 			jsonResponse.setDriver(driver);
@@ -262,7 +283,7 @@ public class DriverController {
 		Driver driver = driverRepo.findOne(id);
 		// check if phone verification is completed, if so just update the
 		// driver info.
-		if (driver.getVerified() == 0) {
+		if (driver.getVerified() == false) {
 			logger.info("phone verification not comepleted");
 			Boolean otpVerified = true;
 			// let's verify the OTP.
@@ -272,7 +293,7 @@ public class DriverController {
 					OTPService otpService = new OTPService();
 					otpVerified = otpService.verifyOTP(sessionId, otp);
 					if (otpVerified) {
-						driver.setVerified(1);
+						driver.setVerified(true);
 					} else {
 						jsonResponse.setCode(AppConfig.INVALID_OTP);
 						jsonResponse.setMessage("Invalid OTP");
@@ -318,25 +339,45 @@ public class DriverController {
 		return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.OK);
 	}
 	
-	private ResponseEntity<?> updateAndroidToken(long driverId, String token) {
+	private ResponseEntity<?> updateRegistrationId(long driverId, String registrationId, String deviceOs) {
+		if (deviceOs.equals("android")) {
+			return updateAndroidRegistrationId(driverId, registrationId);
+		} else {
+			return updateIosRegistrationId(driverId, registrationId);
+		}
+	}
+	
+	private ResponseEntity<?> updateAndroidRegistrationId(long driverId, String androidRegistrationId) {
 		jsonResponse = new CustomResponse();
-		//		try {
 		Driver driver = driverRepo.findOne(driverId);
-		driver.setAndroidToken(token);
-		driverRepo.save(driver);
+		if(driver != null) {
+			driver.setAndroidRegistrationId(androidRegistrationId);
+			driverRepo.save(driver);
+		}  else {
+			jsonResponse.setCode(AppConfig.INVALID_DRIVER_ID);
+			jsonResponse.setMessage("Invalid driver id");
+			return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.BAD_REQUEST);
+		}
 		
 		jsonResponse.setMessage("Driver info updated!");
 		return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.OK);
 	}
 	
-	private ResponseEntity<?> updateiosToken(long driverId, String token) {
+	private ResponseEntity<?> updateIosRegistrationId(long driverId, String iosRegistrationId) {
 		jsonResponse = new CustomResponse();
-		//		try {
 		Driver driver = driverRepo.findOne(driverId);
-		driver.setIosToken(token);
-		driverRepo.save(driver);
+		if(driver != null) {
+			driver.setIosRegistrationId(iosRegistrationId);
+			driverRepo.save(driver);
+		} else{
+			jsonResponse.setCode(AppConfig.INVALID_DRIVER_ID);
+			jsonResponse.setMessage("Invalid driver id");
+			return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.BAD_REQUEST);
+		}
 		
-		jsonResponse.setMessage("Driver info updated!");
+		
+		
+		jsonResponse.setMessage("driver info updated!");
 		return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.OK);
 	}
 
@@ -402,7 +443,7 @@ public class DriverController {
 		return otpService.sendOTP(phoneNumber);
 	}
 
-	private ResponseEntity<?> signin(String phoneNumber, String password) {
+	private ResponseEntity<?> signin(String phoneNumber, String password, String androidRegistrationId, String iosRegistrationId) {
 
 		DriverResponse jsonResponse = new DriverResponse();
 //		Driver driver = driverRepo.findOneByPhoneNumberAndPassword(phoneNumber, passwordEncoder.encode(password));
@@ -412,6 +453,18 @@ public class DriverController {
 //			String token = util.generateDriverToken(driver);
 //			logger.info("api auth JWT = " + token);
 //			jsonResponse.setToken(token);
+			
+			if(androidRegistrationId != null) {
+				driver.setAndroidRegistrationId(androidRegistrationId);
+			} else {
+				driver.setIosRegistrationId(iosRegistrationId);
+			}
+			driver.setStatus(true);
+			driverRepo.save(driver);
+			
+			ArrayList<VehicleRequest> r = getVehicleRequests(driver.getId());
+			driver.setVehicleRequests(r);
+			
 			jsonResponse.setMessage("Success");
 			jsonResponse.setDriver(driver);
 			return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.OK);
@@ -420,6 +473,18 @@ public class DriverController {
 			jsonResponse.setMessage("Login failed");
 			return new ResponseEntity<CustomResponse>(jsonResponse, HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	private ArrayList<VehicleRequest> getVehicleRequests(long driverId) {
+		
+		ArrayList<VehicleRequestNotificationHistory> notificationHistory = historyRepo.findActiveVehicleRequestsByDriverId(driverId);
+		ArrayList<VehicleRequest> vehicleRequests = new ArrayList<>();
+		
+		for(VehicleRequestNotificationHistory history: notificationHistory) {
+			vehicleRequests.add(history.getVehicleRequest());
+		}
+		
+		return vehicleRequests;
 	}
 
 }

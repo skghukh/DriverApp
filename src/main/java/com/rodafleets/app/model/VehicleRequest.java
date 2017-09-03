@@ -1,14 +1,21 @@
 package com.rodafleets.app.model;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="driverrequest")
+@Table(name="vehiclerequests")
 public class VehicleRequest {
 	
 	@Id
@@ -47,6 +54,9 @@ public class VehicleRequest {
 	
 	@Column(name="destinationaddress")
 	private String destinationAddress;
+	
+	@Column(name="expiration")
+	private Date expiration;
 
 	protected VehicleRequest() {}
 
@@ -87,36 +97,36 @@ public class VehicleRequest {
 		this.vehicleTypeId = vehicleTypeId;
 	}
 
-	public double getPickupPointLat() {
+	public double getOriginLat() {
 		return originLat;
 	}
 
-	public void setPickupPointLat(double pickupPointLat) {
-		this.originLat = pickupPointLat;
+	public void setOriginLat(double originLat) {
+		this.originLat = originLat;
 	}
 
-	public double getPickupPointLng() {
+	public double getOriginLng() {
 		return originLng;
 	}
 
-	public void setPickupPointLng(double pickupPointLng) {
-		this.originLng = pickupPointLng;
+	public void setOriginLng(double originLng) {
+		this.originLng = originLng;
 	}
 
-	public double getDropPointLat() {
+	public double getDestinationLat() {
 		return destinationLat;
 	}
 
-	public void setDropPointLat(double dropPointLat) {
-		this.destinationLat = dropPointLat;
+	public void setDestinationLat(double destinationLat) {
+		this.destinationLat = destinationLat;
 	}
 
-	public double getDropPointLng() {
+	public double getDestinationLng() {
 		return destinationLng;
 	}
 
-	public void setDropPointLng(double dropPointLng) {
-		this.destinationLng = dropPointLng;
+	public void setDestinationLng(double destinationLng) {
+		this.destinationLng = destinationLng;
 	}
 
 	public long getLoadingRequired() {
@@ -158,5 +168,24 @@ public class VehicleRequest {
 	public void setDestinationAddress(String destinationAddress) {
 		this.destinationAddress = destinationAddress;
 	}
+
+	public Date getExpiration() {
+		return expiration;
+	}
+
+	public void setExpiration(Date expiration) {
+		this.expiration = expiration;
+	}
 	
+	
+	
+//	
+//    public List<VehicleRequestNotificationHistory> getDrivers() {
+//        //return drivers;
+//    	return null;
+//    }
+//	
+//	public void setDrivers(List<VehicleRequestNotificationHistory> drivers) {
+//        //this.drivers = drivers;
+//    }
 }

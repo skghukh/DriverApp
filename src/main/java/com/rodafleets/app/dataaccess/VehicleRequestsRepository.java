@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import com.rodafleets.app.model.VehicleRequest;
+import com.rodafleets.app.model.VehicleRequestNotificationHistory;
 
-public interface RequestsRepository extends CrudRepository<VehicleRequest, Long> {
-
+public interface VehicleRequestsRepository extends CrudRepository<VehicleRequest, Long> {
+	
 	List<VehicleRequest> findRequestsByCustomerId(long id);
-
 }

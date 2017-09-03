@@ -20,7 +20,8 @@ public class OTPService {
 //		phoneNumber = "9886768498"; //for testing
 		try {
 			Random random = new Random();
-			int otp = 1000 + random.nextInt(9998);
+//			int otp = 1000 + random.nextInt(9998);
+			String otp = String.format("%04d", random.nextInt(10000));
 			
 			url = url + "/SMS/" + phoneNumber + "/" + otp;
 			URL obj = new URL(url);

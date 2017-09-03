@@ -1,12 +1,17 @@
 package com.rodafleets.app.response;
 
+import java.util.ArrayList;
+
 import com.rodafleets.app.model.Driver;
+import com.rodafleets.app.model.VehicleRequest;
 
 public class DriverResponse extends CustomResponse {
 
 	private String sessionId;
 	private String token;
 	private Driver driver;
+	
+	private ArrayList<VehicleRequest> vehicleRequests;
 
 	public String getSessionId() {
 		return sessionId;

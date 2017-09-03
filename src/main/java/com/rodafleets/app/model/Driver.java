@@ -1,14 +1,25 @@
 package com.rodafleets.app.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
-//@NamedQuery(name="Driver.findByPhoneNumber", query = "SELECT * FROM Driver where phonenumber = ?1")
+@Table(name="drivers")
 public class Driver {
 
 	@Id
@@ -25,15 +36,18 @@ public class Driver {
 	private String gender;
 	
 	private String password;
-	private long verified;
 	
-	@Column(name="androidtoken")
-	private String androidToken;
+	@Column(name="androidregistrationid")
+	private String androidRegistrationId;
 	
-	@Column(name="iostoken")
-	private String iosToken;
+	@Column(name="iosregistrationid")
+	private String iosRegistrationId;
 	
-	private Boolean status;
+	private boolean status;
+	private boolean verified;
+	
+	@Transient
+	private ArrayList<VehicleRequest> vehicleRequests;
 
 	protected Driver() {}
 
@@ -44,28 +58,28 @@ public class Driver {
 		this.gender = gender;
 	}
 
-	public Boolean getStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(Boolean status) {
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
 
-	public String getAndroidToken() {
-		return androidToken;
+	public String getAndroidRegistrationId() {
+		return androidRegistrationId;
 	}
 
-	public void setAndroidToken(String androidToken) {
-		this.androidToken = androidToken;
+	public void setAndroidRegistrationId(String androidRegistrationId) {
+		this.androidRegistrationId = androidRegistrationId;
 	}
 
-	public String getIosToken() {
-		return iosToken;
+	public String getIosRegistrationId() {
+		return iosRegistrationId;
 	}
 
-	public void setIosToken(String iosToken) {
-		this.iosToken = iosToken;
+	public void setIosRegistrationId(String iosRegistrationId) {
+		this.iosRegistrationId = iosRegistrationId;
 	}
 
 	public long getId() {
@@ -108,19 +122,23 @@ public class Driver {
 		this.gender = gender;
 	}
 
-//	public String getPassword() {
-//		return password;
-//	}
-
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	public long getVerified() {
+	public boolean getVerified() {
 		return verified;
 	}
 
-	public void setVerified(long verified) {
+	public void setVerified(boolean verified) {
 		this.verified = verified;
 	}
+
+    public ArrayList<VehicleRequest> getVehicleRequests() {
+    	return vehicleRequests;
+    }
+    
+    public void setVehicleRequests(ArrayList<VehicleRequest> vehicleRequests) {
+    	this.vehicleRequests = vehicleRequests;
+    }
 }

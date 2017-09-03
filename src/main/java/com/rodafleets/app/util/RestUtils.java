@@ -26,14 +26,11 @@ public class RestUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(RestUtils.class);
 	
-	public JSONObject httpGetRequest(String url, List<NameValuePair> urlParameters) {
+	public JSONObject httpGetRequest(String url, String urlParameterString) {
 		JSONObject jsonResponse;
 		try{
-			
-			url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=12.937216,77.627524&key=AIzaSyD8-tzqtt9eK1Ab_szqWW88Gw_Zn5cdTLs&destinations=12.959383,77.643403";
-
 			HttpClient client = HttpClientBuilder.create().build();
-			HttpGet request = new HttpGet(url);
+			HttpGet request = new HttpGet(url + urlParameterString);
 
 			// add request header
 			//		request.addHeader("User-Agent", USER_AGENT);
@@ -95,12 +92,40 @@ public class RestUtils {
 
 	public JSONObject distance(double originLat, double originLng,
 			double destinationLat, double destinationLng) {
-		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
-		urlParameters.add(new BasicNameValuePair("origins", originLat + "," + originLng));
-		urlParameters.add(new BasicNameValuePair("destinations", destinationLat + "," + destinationLng));
-		urlParameters.add(new BasicNameValuePair("key", AppConfig.GOOGLE_DISTANCE_MATRIX_API_KEY));
 		
-		return this.httpGetRequest(AppConfig.GOOGLE_DISTANCE_MATRIX_API_URL, urlParameters);
-	}
+		JSONObject jsonResponse;
+		String urlParameterString = 
+				"?origins=" + originLat + "," + originLng 
+				+ "&destinations=" + destinationLat + "," + destinationLng 
+				+ "&key=" + AppConfig.GOOGLE_DISTANCE_MATRIX_API_KEY;
+		String url = AppConfig.GOOGLE_DISTANCE_MATRIX_API_URL + urlParameterString;
+	
+		try{
+			HttpClient client = HttpClientBuilder.create().build();
+			HttpGet request = new HttpGet(url);
 
+			// add request header
+			//		request.addHeader("User-Agent", USER_AGENT);
+			HttpResponse response = client.execute(request);
+			
+			log.info("Response HttpStatusCode = " + response.getStatusLine().getStatusCode());
+
+			BufferedReader rd = new BufferedReader(
+					new InputStreamReader(response.getEntity().getContent()));
+
+			StringBuffer result = new StringBuffer();
+			String line = "";
+			while ((line = rd.readLine()) != null) {
+				result.append(line);
+			}
+			
+			log.info("GET Response : " + result.toString());
+			jsonResponse = new JSONObject(result.toString());
+			return jsonResponse;
+			
+		}catch (Exception e) {
+			log.error("http GET exception" + e.toString());
+			return null;
+		}
+	}
 }

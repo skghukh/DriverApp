@@ -39,10 +39,10 @@ public class EstimatesController {
 	@RequestMapping(value = "/{vehicletype_id}", method = RequestMethod.POST)
 	public ResponseEntity<?> estimateTripCost(
 			@PathVariable("vehicletype_id") long vehicleTypeId,
-			@RequestParam(value="pickup_lat") double pickupPointLat,
-			@RequestParam(value="pickup_lng") double pickupPointLng,
-			@RequestParam(value="drop_lat") double dropPointLat,
-			@RequestParam(value="drop_lng") double dropPointLng,
+			@RequestParam(value="origin_lat") double pickupPointLat,
+			@RequestParam(value="origin_lng") double pickupPointLng,
+			@RequestParam(value="destination_lat") double dropPointLat,
+			@RequestParam(value="destination_lng") double dropPointLng,
 			@RequestParam(value="loading_required", defaultValue="0") long loadingRequired,
 			@RequestParam(value="unloading_required", defaultValue="0") long unloadingRequired) {
 		return calculateTripCost(vehicleTypeId, pickupPointLat, pickupPointLng, dropPointLat, dropPointLng, loadingRequired, unloadingRequired);
@@ -54,9 +54,9 @@ public class EstimatesController {
 		try {
 			//calculate distance and time between pickup and drop.
 			RestUtils utils = new RestUtils();
-			//JSONObject distObj = utils.distance(pickupPointLat, pickupPointLng, dropPointLat, dropPointLng);
-			String str = "{\"destination_addresses\":[\"Diamond District, H A L Old Airport Rd, ISRO Colony, Domlur, Bengaluru, Karnataka 560008, India\"],\"origin_addresses\":[\"43, 20th L Cross Rd, AVS Layout, Koramangala, Bengaluru, Karnataka 560095, India\"],\"rows\":[{\"elements\":[{\"distance\":{\"text\":\"6.0 km\",\"value\":6044},\"duration\":{\"text\":\"17 mins\",\"value\":1034},\"status\":\"OK\"}]}],\"status\":\"OK\"}";
-			JSONObject apiResponse = new JSONObject(str);
+			JSONObject apiResponse = utils.distance(pickupPointLat, pickupPointLng, dropPointLat, dropPointLng);
+//			String str = "{\"destination_addresses\":[\"Diamond District, H A L Old Airport Rd, ISRO Colony, Domlur, Bengaluru, Karnataka 560008, India\"],\"origin_addresses\":[\"43, 20th L Cross Rd, AVS Layout, Koramangala, Bengaluru, Karnataka 560095, India\"],\"rows\":[{\"elements\":[{\"distance\":{\"text\":\"6.0 km\",\"value\":6044},\"duration\":{\"text\":\"17 mins\",\"value\":1034},\"status\":\"OK\"}]}],\"status\":\"OK\"}";
+//			JSONObject apiResponse = new JSONObject(str);
 			if(apiResponse.getString("status").equalsIgnoreCase("OK")) {
 				
 				//return the first calculated route info for approx fare estimate

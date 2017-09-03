@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -18,7 +19,7 @@ import com.rodafleets.app.config.AppConfig;
 public class FCMService {
 	private final Log logger = LogFactory.getLog(this.getClass());
 
-	public void sendAndroidNotification(String deviceToken, JSONObject infoJson, JSONObject dataJson) {
+	public void sendAndroidNotification(ArrayList<String> deviceToken, JSONObject infoJson, JSONObject dataJson) {
 		try {
 			String url = AppConfig.FCM_SERVICE_URL;
 			URL obj = new URL(url);
@@ -34,7 +35,7 @@ public class FCMService {
 			con.setRequestProperty("Authorization", "key=" + AppConfig.FCM_SERVICE_KEY);
 	
 			JSONObject json = new JSONObject();
-			json.put("to", deviceToken.trim());
+			json.put("registration_ids", deviceToken.toArray());
 			json.put("notification", infoJson);
 			json.put("data", dataJson);
 			

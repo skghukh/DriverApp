@@ -112,6 +112,7 @@ public class Customer {
 	
 	public String getFullName() {
 		//TODO
-		return firstName + " " + lastName;
+		return "ADITYA";
+//		return firstName + " " + lastName;
 	}
 }
