@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".VehicleRequestListActivity">
+        <activity android:name=".SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,7 +28,7 @@
         <activity android:name=".SignUpVerificationActivity" />
         <activity android:name=".VehicleDetailsActivity" />
         <activity android:name=".DriverDocs" />
-        <activity android:name=".SplashScreenActivity" />
+        <activity android:name=".VehicleRequestListActivity" />
         <activity android:name=".VehicleRequestActivity" />
         <activity android:name=".TripProgressActivity" />
         <activity android:name=".RequestHistoryListActivity" />
