@@ -50,7 +50,8 @@ public class FileArchiveService {
 			log.info("s3 bucket name = " + request.getBucketName());
 			log.info("s3 filename to save = " + request.getKey());
 			
-			s3Client.putObject(request);
+			//Need to be done when s3 is done.
+			//s3Client.putObject(request);
 			
 			String publicUrl = s3Client.getResourceUrl(S3_BUCKET_NAME, key);
 			

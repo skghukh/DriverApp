@@ -1,8 +1,6 @@
 package com.rodafleets.app.service;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
@@ -12,6 +10,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.rodafleets.app.config.AppConfig;
@@ -35,7 +34,8 @@ public class FCMService {
 			con.setRequestProperty("Authorization", "key=" + AppConfig.FCM_SERVICE_KEY);
 	
 			JSONObject json = new JSONObject();
-			json.put("registration_ids", deviceToken.toArray());
+			json.put("registration_ids", new JSONArray(deviceToken));
+			// json.put("to", deviceToken.toArray());
 			json.put("notification", infoJson);
 			json.put("data", dataJson);
 			

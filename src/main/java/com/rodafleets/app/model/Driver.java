@@ -19,7 +19,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name="drivers")
+@Table(name="driver")
 public class Driver {
 
 	@Id

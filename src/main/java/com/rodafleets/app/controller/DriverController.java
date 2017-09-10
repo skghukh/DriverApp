@@ -6,27 +6,22 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.rodafleets.app.auth.jwt.JwtTokenUtil;
 import com.rodafleets.app.config.AppConfig;
 import com.rodafleets.app.dataaccess.DriverDocsRepository;
 import com.rodafleets.app.dataaccess.DriverRepository;
 import com.rodafleets.app.dataaccess.VehicleRequestNotificationHistoryRepository;
 import com.rodafleets.app.dataaccess.VehicleRequestsRepository;
-import com.rodafleets.app.exception.CustomException;
 import com.rodafleets.app.model.Driver;
 import com.rodafleets.app.model.DriverDocs;
 import com.rodafleets.app.model.VehicleRequest;
@@ -35,8 +30,6 @@ import com.rodafleets.app.response.CustomResponse;
 import com.rodafleets.app.response.DriverResponse;
 import com.rodafleets.app.service.FileArchiveService;
 import com.rodafleets.app.service.OTPService;
-
-import net.minidev.json.JSONArray;
 
 /*===================  Driver API  =================== */
 
