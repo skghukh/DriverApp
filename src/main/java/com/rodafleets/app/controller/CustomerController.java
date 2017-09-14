@@ -69,8 +69,12 @@ public class CustomerController {
 
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<?> saveCustomer(
-			@RequestParam(value="phonenumber") String phoneNumber) {
-		return addCustomer(phoneNumber);
+			@RequestParam(value = "phonenumber") String phoneNumber,
+			@RequestParam(value = "firstname") String firstName, @RequestParam(value = "lastname") String lastName,
+			@RequestParam(value = "gender") String gender,
+			@RequestParam(value = "android_token", required = false) String androidToken,
+			@RequestParam(value = "ios_token", required = false) String iosToken) {
+		return addCustomer(phoneNumber, firstName, lastName, gender);
 	}
 
 	/*
@@ -130,14 +134,14 @@ public class CustomerController {
 		return new ResponseEntity<List>(customers, HttpStatus.CREATED);
 	}
 	
-	private ResponseEntity<?> addCustomer(String phoneNumber) {
+	private ResponseEntity<?> addCustomer(String phoneNumber, String firstName, String lastName, String gender) {
 		jsonResponse = new CustomResponse();
 		try {
 			Customer customer = new Customer(phoneNumber);
-			customer.setGender("0"); // default value
+			customer.setGender(gender); // default value
 			customer.setPassword(""); // default value
-			customer.setFirstName(""); // default value
-			customer.setLastName(""); // default value
+			customer.setFirstName(firstName); // default value
+			customer.setLastName(lastName); // default value
 			customerRepo.save(customer);
 		}
 		catch (Exception ex) {

@@ -5,34 +5,43 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "customer")
 public class Customer {
-	
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	@Column(name="phonenumber")
+	@Column(name = "phonenumber")
 	private String phoneNumber;
-	
-	@Column(columnDefinition="default 0")
+
+	@Column(columnDefinition = "default 0")
 	private String gender;
-	
-	@Column(name="companyname")
-	private String companyName; 
-	
-	@Column(name="firstname")
+
+	@Column(name = "companyname")
+	private String companyName;
+
+	@Column(name = "firstname")
 	private String firstName;
-	
-	@Column(name="lastname")
+
+	@Column(name = "lastname")
 	private String lastName;
-	
+
+	@Column(name = "androidregistrationid")
+	private String androidRegistrationId;
+
+	@Column(name = "iosregistrationid")
+	private String iosRegistrationId;
+
 	private String password;
 	private long verified;
 	private String address;
 
-	protected Customer() {}
+	protected Customer() {
+	}
 
 	public Customer(String phonenumber) {
 		this.phoneNumber = phonenumber;
@@ -109,10 +118,26 @@ public class Customer {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
+
+	public String getAndroidRegistrationId() {
+		return androidRegistrationId;
+	}
+
+	public void setAndroidRegistrationId(String androidRegistrationId) {
+		this.androidRegistrationId = androidRegistrationId;
+	}
+
+	public String getIosRegistrationId() {
+		return iosRegistrationId;
+	}
+
+	public void setIosRegistrationId(String iosRegistrationId) {
+		this.iosRegistrationId = iosRegistrationId;
+	}
+
 	public String getFullName() {
-		//TODO
+		// TODO
 		return "ADITYA";
-//		return firstName + " " + lastName;
+		// return firstName + " " + lastName;
 	}
 }
