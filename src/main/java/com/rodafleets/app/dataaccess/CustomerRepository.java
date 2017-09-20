@@ -11,4 +11,5 @@ public interface CustomerRepository extends CrudRepository<Customer, Long> {
 	List<Customer> findAll();
 	List<Customer> findByFirstNameAllIgnoreCase(String firstName);
 	List<Customer> findByFirstNameAndLastNameAllIgnoreCase(String firstName, String lastName);
+	Customer findOneByPhoneNumberAndPassword(String phoneNumber, String password);
 }

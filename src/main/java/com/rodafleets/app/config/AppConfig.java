@@ -12,7 +12,7 @@ public class AppConfig {
 	
 	public static final String FCM_SERVICE_URL = "https://fcm.googleapis.com/fcm/send";
 	public static final String FCM_SERVICE_KEY = "AAAAVKCtMEU:APA91bHGbZ3qnMmOv7vk0IZLK49foRCmhl_b1i3qfEj2WSwABsiTiBO6VZdgZju0MAtRvYaM0S98z7R51c3cMDeO1q5U2MKTQaONYKnXdGrGjqVndiborFaovFejOY36G_Z9PbIa8_b9";
-	
+
 	public static final int REQUEST_EXPIRATION = 24;
 	//VEHICLE_REQUEST STATUS CODES
 	
