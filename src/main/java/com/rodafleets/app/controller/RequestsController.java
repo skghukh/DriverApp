@@ -128,7 +128,7 @@ public class RequestsController {
 		return new ResponseEntity<List>(requests, HttpStatus.CREATED);
 	}
 
-	private ResponseEntity<?> addRequest(long vehicleTypeId, long customerId, double originLat, double originLng,
+	private ResponseEntity<?> addRequest(long customerId, long vehicleTypeId, double originLat, double originLng,
 			double destinationLat, double destinationLng, long loadingRequired, long unloadingRequired,
 			long approxFareInCents) {
 		jsonResponse = new CustomResponse();
@@ -250,7 +250,7 @@ public class RequestsController {
 			ArrayList<String> tokens = new ArrayList<>();
 			tokens.add(androidToken);
 			JSONObject infoJson = new JSONObject();
-			infoJson.put("title", "Request Accepted");
+				infoJson.put("title", "Request_Accepted");
 			infoJson.put("body",
 					driver.getFirstName() + " has accepted request " + requestId + "Charges " + bidAmountInCents);
 			JSONObject dataJson = new JSONObject();
