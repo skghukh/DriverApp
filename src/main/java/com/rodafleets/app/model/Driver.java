@@ -32,6 +32,7 @@ public class Driver {
 	@Column(name="androidregistrationid")
 	private String androidRegistrationId;
 	
+
 	@Column(name="iosregistrationid")
 	private String iosRegistrationId;
 	

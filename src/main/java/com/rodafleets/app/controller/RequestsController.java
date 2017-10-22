@@ -22,12 +22,14 @@ import com.rodafleets.app.dataaccess.BidRepository;
 import com.rodafleets.app.dataaccess.CustomerRepository;
 import com.rodafleets.app.dataaccess.DriverRepository;
 import com.rodafleets.app.dataaccess.TripRepository;
+import com.rodafleets.app.dataaccess.VehicleRepository;
 import com.rodafleets.app.dataaccess.VehicleRequestNotificationHistoryRepository;
 import com.rodafleets.app.dataaccess.VehicleRequestsRepository;
 import com.rodafleets.app.model.Bid;
 import com.rodafleets.app.model.Customer;
 import com.rodafleets.app.model.Driver;
 import com.rodafleets.app.model.Trip;
+import com.rodafleets.app.model.Vehicle;
 import com.rodafleets.app.model.VehicleRequest;
 import com.rodafleets.app.model.VehicleRequestNotificationHistory;
 import com.rodafleets.app.response.BidResponse;
@@ -68,6 +70,9 @@ public class RequestsController {
 
 	@Autowired
 	private TripRepository tripRepo;
+
+	@Autowired
+	private VehicleRepository vehicleRepo;
 
 	/*
 	 * Retrive all drivers and their info
@@ -186,7 +191,7 @@ public class RequestsController {
 		BidResponse jsonResponse = new BidResponse();
 		Bid bid = new Bid(requestId, driverId, bidAmountInCents, AppConfig.BID_STATUS_PENDING);
 		bidRepo.save(bid);
-		sendBidNotificationToCustomer(requestId, driverId, bidAmountInCents);
+		sendBidNotificationToCustomer(requestId, bid.getId(), driverId, bidAmountInCents);
 		jsonResponse.setMessage("Bid info saved");
 		jsonResponse.setBid(bid);
 		return new ResponseEntity<BidResponse>(jsonResponse, HttpStatus.CREATED);
@@ -234,7 +239,7 @@ public class RequestsController {
 		}
 	}
 
-	private void sendBidNotificationToCustomer(long requestId, long driverId, long bidAmountInCents) {
+	private void sendBidNotificationToCustomer(long requestId, long bidId, long driverId, long bidAmountInCents) {
 		Driver driver = driverRepo.findOne(driverId);
 		VehicleRequest request = requestsRepo.findOne(requestId);
 		Customer customer = null;
@@ -246,19 +251,27 @@ public class RequestsController {
 		}
 		if (null != driver && null != customer) {
 			try {
-			String androidToken = customer.getAndroidRegistrationId();
-			ArrayList<String> tokens = new ArrayList<>();
-			tokens.add(androidToken);
-			JSONObject infoJson = new JSONObject();
+				String androidToken = customer.getAndroidRegistrationId();
+				ArrayList<String> tokens = new ArrayList<>();
+				tokens.add(androidToken);
+				JSONObject infoJson = new JSONObject();
 				infoJson.put("title", "Request_Accepted");
-			infoJson.put("body",
-					driver.getFirstName() + " has accepted request " + requestId + "Charges " + bidAmountInCents);
-			JSONObject dataJson = new JSONObject();
-			dataJson.put("driverName", driver.getFirstName());
-			dataJson.put("requestId", requestId);
-			dataJson.put("Amount", bidAmountInCents);
-			FCMService fcmService = new FCMService();
-			fcmService.sendAndroidNotification(tokens, infoJson, dataJson);
+				infoJson.put("body",
+						driver.getFirstName() + " has accepted request " + requestId + "Charges " + bidAmountInCents);
+				JSONObject dataJson = new JSONObject();
+				dataJson.put("driverName", driver.getFirstName());
+				dataJson.put("requestId", requestId);
+				dataJson.put("bid", bidId);
+				List<Vehicle> vehicleListOfDriver = vehicleRepo.findByDriverId(driverId);
+				if (vehicleListOfDriver.isEmpty()) {
+					logger.error("No vehicle owned by driver");
+					return;
+				}
+				dataJson.put("vehicleRegId", vehicleListOfDriver.get(0).getNumber());
+				dataJson.put("driverContact", driver.getPhoneNumber());
+				dataJson.put("Amount", bidAmountInCents);
+				FCMService fcmService = new FCMService();
+				fcmService.sendAndroidNotification(tokens, infoJson, dataJson);
 			} catch (Exception e) {
 				System.out.println("Exception " + e);
 			}
@@ -338,7 +351,7 @@ public class RequestsController {
 				fcmService.sendAndroidNotification(androidTokens, notificationJson, dataJson);
 
 			} catch (Exception e) {
-
+				System.out.println(e);
 			}
 		}
 	}
