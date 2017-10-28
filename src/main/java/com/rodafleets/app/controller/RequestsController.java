@@ -223,11 +223,12 @@ public class RequestsController {
 			bidRepo.save(bid);
 
 			// create new trip
-			Trip trip = new Trip(requestId, bidId, customerId, AppConfig.TRIP_STATUS_CONFIRMED);
+			Trip trip = new Trip(requestId, bidId, customerId, (int) bid.getDriverId(),
+					AppConfig.TRIP_STATUS_CONFIRMED);
 			tripRepo.save(trip);
 
 			// TODO send notification to driver
-			sendTripNotificationToDriver(bid.getDriverId());
+			sendTripNotificationToDriver(bid.getDriverId(), trip.getId(), requestId);
 
 			jsonResponse.setMessage("trip confirmed");
 			jsonResponse.setTrip(trip);
@@ -259,7 +260,11 @@ public class RequestsController {
 				infoJson.put("body",
 						driver.getFirstName() + " has accepted request " + requestId + "Charges " + bidAmountInCents);
 				JSONObject dataJson = new JSONObject();
+				dataJson.put("driverId", driver.getId());
 				dataJson.put("driverName", driver.getFirstName());
+				dataJson.put("driverContact", driver.getPhoneNumber());
+				dataJson.put("driverRating", "4.2");
+				dataJson.put("driverDistance", "6.5km");
 				dataJson.put("requestId", requestId);
 				dataJson.put("bid", bidId);
 				List<Vehicle> vehicleListOfDriver = vehicleRepo.findByDriverId(driverId);
@@ -268,7 +273,6 @@ public class RequestsController {
 					return;
 				}
 				dataJson.put("vehicleRegId", vehicleListOfDriver.get(0).getNumber());
-				dataJson.put("driverContact", driver.getPhoneNumber());
 				dataJson.put("Amount", bidAmountInCents);
 				FCMService fcmService = new FCMService();
 				fcmService.sendAndroidNotification(tokens, infoJson, dataJson);
@@ -330,13 +334,10 @@ public class RequestsController {
 		}
 	}
 
-	private void sendTripNotificationToDriver(long driverId) {
-		CustomResponse jsonResponse = new CustomResponse();
+	private void sendTripNotificationToDriver(long driverId, long tripId, long requestId) {
 		Driver driver = driverRepo.findOne(driverId);
-
 		ArrayList<String> androidTokens = new ArrayList<>();
 		if (driver != null) {
-
 			try {
 				androidTokens.add(driver.getAndroidRegistrationId());
 
@@ -345,14 +346,14 @@ public class RequestsController {
 				notificationJson.put("body", "Bid Accepted");
 				//
 				JSONObject dataJson = new JSONObject();
-				// dataJson.put("customerName", customer.getFullName());
-
+				dataJson.put("tripId", tripId);
+				dataJson.put("requestId", requestId);
 				FCMService fcmService = new FCMService();
 				fcmService.sendAndroidNotification(androidTokens, notificationJson, dataJson);
-
 			} catch (Exception e) {
 				System.out.println(e);
 			}
 		}
 	}
+
 }

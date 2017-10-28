@@ -28,7 +28,7 @@ public class AppConfig {
 	public static final int TRIP_STATUS_STARTED = 2;
 	public static final int TRIP_STATUS_UNLOADING = 3;
 	public static final int TRIP_STATUS_PAYMENT = 4;
-	public static final int TRIP_STATUS_COMPLETED = 5;
+	public static final int TRIP_STATUS_COMPLETED = 10;
 	
 	// ERROR CODES
 	//common

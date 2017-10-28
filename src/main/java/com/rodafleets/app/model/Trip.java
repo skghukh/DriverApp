@@ -8,29 +8,35 @@ import javax.persistence.Id;
 
 @Entity
 public class Trip {
-	
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	@Column(name="bid_id")
+	@Column(name = "bid_id")
 	private long bidId;
-	
-	@Column(name="vehiclerequest_id")
-	private long requestId; 
-	
-	@Column(name="customer_id")
+
+	@Column(name = "vehiclerequest_id")
+	private long requestId;
+
+	@Column(name = "customer_id")
 	private long customerId;
 
+	@Column(name = "driver_id")
+	private int driverId;
+
+	@Column(name = "status")
 	private int status;
 
-	protected Trip() {}
-	
-	public Trip(long requestId, long bidId, long customerId, int status) {
+	protected Trip() {
+	}
+
+	public Trip(long requestId, long bidId, long customerId, int driverId, int status) {
 		this.requestId = requestId;
 		this.bidId = bidId;
 		this.customerId = customerId;
 		this.status = status;
+		this.driverId = driverId;
 	}
 
 	public long getId() {
@@ -72,4 +78,13 @@ public class Trip {
 	public void setStatus(int status) {
 		this.status = status;
 	}
+
+	public long getDriverId() {
+		return driverId;
+	}
+
+	public void setDriverId(int driverId) {
+		this.driverId = driverId;
+	}
+
 }
